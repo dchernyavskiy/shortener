@@ -17,7 +17,7 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IUrlsClient {
     get(query: GetUrls | undefined): Observable<GetUrlsResponse>;
-    create(command: CreateShortUrl): Observable<CreateShortUrlResponse>;
+    create(command: CreateShortUrlDto): Observable<CreateShortUrlResponse>;
 }
 
 @Injectable({
@@ -85,7 +85,7 @@ export class UrlsClient implements IUrlsClient {
         return _observableOf(null as any);
     }
 
-    create(command: CreateShortUrl): Observable<CreateShortUrlResponse> {
+    create(command: CreateShortUrlDto): Observable<CreateShortUrlResponse> {
         let url_ = this.baseUrl + "/api/Urls";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -135,6 +135,13 @@ export class UrlsClient implements IUrlsClient {
             let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result401 = ProblemDetails.fromJS(resultData401);
             return throwException("A server side error occurred.", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 409) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result409: any = null;
+            let resultData409 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result409 = ProblemDetails.fromJS(resultData409);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result409);
             }));
         } else {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -270,6 +277,9 @@ export interface IGetUrls {
 }
 
 export class CreateShortUrlResponse implements ICreateShortUrlResponse {
+    id?: string;
+    baseUrl?: string;
+    shortenedUrl?: string;
 
     constructor(data?: ICreateShortUrlResponse) {
         if (data) {
@@ -281,6 +291,11 @@ export class CreateShortUrlResponse implements ICreateShortUrlResponse {
     }
 
     init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.baseUrl = _data["baseUrl"];
+            this.shortenedUrl = _data["shortenedUrl"];
+        }
     }
 
     static fromJS(data: any): CreateShortUrlResponse {
@@ -292,11 +307,17 @@ export class CreateShortUrlResponse implements ICreateShortUrlResponse {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["baseUrl"] = this.baseUrl;
+        data["shortenedUrl"] = this.shortenedUrl;
         return data;
     }
 }
 
 export interface ICreateShortUrlResponse {
+    id?: string;
+    baseUrl?: string;
+    shortenedUrl?: string;
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -363,10 +384,10 @@ export interface IProblemDetails {
     [key: string]: any;
 }
 
-export class CreateShortUrl implements ICreateShortUrl {
+export class CreateShortUrlDto implements ICreateShortUrlDto {
     url?: string;
 
-    constructor(data?: ICreateShortUrl) {
+    constructor(data?: ICreateShortUrlDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -381,9 +402,9 @@ export class CreateShortUrl implements ICreateShortUrl {
         }
     }
 
-    static fromJS(data: any): CreateShortUrl {
+    static fromJS(data: any): CreateShortUrlDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateShortUrl();
+        let result = new CreateShortUrlDto();
         result.init(data);
         return result;
     }
@@ -395,7 +416,7 @@ export class CreateShortUrl implements ICreateShortUrl {
     }
 }
 
-export interface ICreateShortUrl {
+export interface ICreateShortUrlDto {
     url?: string;
 }
 

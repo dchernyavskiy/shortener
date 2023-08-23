@@ -1,0 +1,16 @@
+<div
+  class="tw-fixed  tw-right-4 tw-top-2 tw-flex tw-flex-col tw-space-y-2">
+  <div
+    *ngFor="let notification of notifications"
+    name="notification"
+    class="tw-flex tw-space-x-2 tw-rounded-md tw-px-4 tw-py-2 tw-bg-blue-500 tw-font-semibold text-white">
+    <span>{{notification.title}}</span>
+    <svg
+      (click)="close(notification)"
+      xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </div>
+</div>
