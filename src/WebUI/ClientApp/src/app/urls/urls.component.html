@@ -23,15 +23,30 @@
         <th scope="col" class="tw-px-6 tw-py-3">
           Encoded Url
         </th>
+        <th scope="col" class="tw-px-6 tw-py-3">
+          Actions
+        </th>
       </tr>
       </thead>
       <tbody>
       <tr class="tw-bg-white tw-border-b" *ngFor="let url of urls">
-        <th scope="row" class="tw-px-6 tw-py-4 tw-font-medium tw-text-gray-900 tw-whitespace-nowrap ">
-          {{url.baseUrl}}
+        <th scope="row"
+            class="tw-px-6 tw-whitespace-pre-line tw-py-4 tw-font-medium tw-text-gray-900 tw-whitespace-nowrap ">
+          <a [href]="url.baseUrl">
+            {{url.baseUrl}}
+          </a>
         </th>
         <td class="tw-px-6 tw-py-4">
-          {{url.shortenedUrl}}
+          <a [href]="url.shortenedUrl">
+            {{url.shortenedUrl}}
+          </a>
+        </td>
+        <td class="tw-px-6 tw-py-4">
+          <button class="tw-px-4 tw-py-2 tw-rounded-md tw-bg-rose-500 tw-font-semibold text-white"
+                  (click)="delete(url)"
+                  *ngIf="url.isDeletable">
+            Delete
+          </button>
         </td>
       </tr>
       </tbody>

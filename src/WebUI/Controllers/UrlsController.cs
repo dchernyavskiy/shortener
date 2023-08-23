@@ -1,13 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shortener.Application.Urls.Features.CreatingShortUrl.v1;
 using Shortener.Application.Urls.Features.GettingUrls.v1;
 using Microsoft.AspNetCore.Http;
+using Shortener.Application.Urls.Features.DeletingUrl.v1;
 
 namespace Shortener.WebUI.Controllers;
 
 public class UrlsController : ApiControllerBase
 {
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    public UrlsController(IWebHostEnvironment webHostEnvironment)
+    {
+        _webHostEnvironment = webHostEnvironment;
+    }
+
     [HttpGet]
     public async Task<ActionResult<GetUrlsResponse>> Get([FromQuery] GetUrls query)
     {
@@ -20,8 +29,17 @@ public class UrlsController : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesDefaultResponseType]
-    public async Task<ActionResult<CreateShortUrlResponse>> Create([FromBody] CreateShortUrlDto command)
+    public async Task<ActionResult<CreateShortUrlResponse>> Create([FromBody] CreateShortUrl command)
     {
-        return await Mediator.Send(new CreateShortUrl(command.Url, Request.Host.Host));
+        return await Mediator.Send(command);
+    }
+
+    [HttpDelete]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete([FromBody] DeleteUrl command)
+    {
+        await Mediator.Send(command);
+        return NoContent();
     }
 }

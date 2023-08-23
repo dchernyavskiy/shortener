@@ -13,5 +13,6 @@ public class CurrentUserService : ICurrentUserService
     }
 
     public string? UserId => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-    public string? Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
+    public string? Role => 
+        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
 }

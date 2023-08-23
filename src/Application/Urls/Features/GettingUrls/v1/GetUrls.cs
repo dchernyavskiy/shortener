@@ -45,7 +45,7 @@ public class GetUrlsHandler : IRequestHandler<GetUrls, GetUrlsResponse>
         };
         _strategies = new Dictionary<string, Func<Task<GetUrlsResponse>>>()
         {
-            { "Admin", admin }, { "User", user }, { string.Empty, anonymous },
+            { "Administrator", admin }, { "User", user }, { string.Empty, anonymous },
         };
     }
 

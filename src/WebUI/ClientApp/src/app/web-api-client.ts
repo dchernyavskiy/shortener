@@ -17,7 +17,8 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IUrlsClient {
     get(query: GetUrls | undefined): Observable<GetUrlsResponse>;
-    create(command: CreateShortUrlDto): Observable<CreateShortUrlResponse>;
+    create(command: CreateShortUrl): Observable<CreateShortUrlResponse>;
+    delete(command: DeleteUrl): Observable<void>;
 }
 
 @Injectable({
@@ -85,7 +86,7 @@ export class UrlsClient implements IUrlsClient {
         return _observableOf(null as any);
     }
 
-    create(command: CreateShortUrlDto): Observable<CreateShortUrlResponse> {
+    create(command: CreateShortUrl): Observable<CreateShortUrlResponse> {
         let url_ = this.baseUrl + "/api/Urls";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -151,6 +152,54 @@ export class UrlsClient implements IUrlsClient {
             return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
             }));
         }
+    }
+
+    delete(command: DeleteUrl): Observable<void> {
+        let url_ = this.baseUrl + "/api/Urls";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
     }
 }
 
@@ -384,10 +433,10 @@ export interface IProblemDetails {
     [key: string]: any;
 }
 
-export class CreateShortUrlDto implements ICreateShortUrlDto {
+export class CreateShortUrl implements ICreateShortUrl {
     url?: string;
 
-    constructor(data?: ICreateShortUrlDto) {
+    constructor(data?: ICreateShortUrl) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -402,9 +451,9 @@ export class CreateShortUrlDto implements ICreateShortUrlDto {
         }
     }
 
-    static fromJS(data: any): CreateShortUrlDto {
+    static fromJS(data: any): CreateShortUrl {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateShortUrlDto();
+        let result = new CreateShortUrl();
         result.init(data);
         return result;
     }
@@ -416,8 +465,44 @@ export class CreateShortUrlDto implements ICreateShortUrlDto {
     }
 }
 
-export interface ICreateShortUrlDto {
+export interface ICreateShortUrl {
     url?: string;
+}
+
+export class DeleteUrl implements IDeleteUrl {
+    id?: string;
+
+    constructor(data?: IDeleteUrl) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): DeleteUrl {
+        data = typeof data === 'object' ? data : {};
+        let result = new DeleteUrl();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IDeleteUrl {
+    id?: string;
 }
 
 export class SwaggerException extends Error {

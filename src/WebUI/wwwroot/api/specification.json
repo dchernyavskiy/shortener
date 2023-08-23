@@ -45,7 +45,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateShortUrlDto"
+                "$ref": "#/components/schemas/CreateShortUrl"
               }
             }
           },
@@ -92,6 +92,34 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Urls"
+        ],
+        "operationId": "Urls_Delete",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteUrl"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": ""
           }
         },
         "security": [
@@ -184,12 +212,22 @@
           }
         }
       },
-      "CreateShortUrlDto": {
+      "CreateShortUrl": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "DeleteUrl": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
           }
         }
       }

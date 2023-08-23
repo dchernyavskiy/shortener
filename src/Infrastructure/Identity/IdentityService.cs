@@ -1,4 +1,5 @@
-﻿using Shortener.Application.Common.Interfaces;
+﻿using System.Security.Claims;
+using Shortener.Application.Common.Interfaces;
 using Shortener.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

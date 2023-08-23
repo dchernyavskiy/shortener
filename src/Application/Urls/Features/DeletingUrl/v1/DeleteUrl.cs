@@ -36,7 +36,7 @@ public class DeleteUrlHandler : IRequestHandler<DeleteUrl>
         };
         _strategies = new Dictionary<string, Func<Url, CancellationToken, Task>>()
         {
-            { "Admin", delete }, { "User", user }
+            { "Administrator", delete }, { "User", user }
         };
     }
 

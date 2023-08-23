@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {CreateShortUrlDto, GetUrls, UrlBriefDto, UrlsClient} from "../web-api-client";
+import {CreateShortUrl, DeleteUrl, GetUrls, UrlBriefDto, UrlsClient} from "../web-api-client";
 import {catchError} from "rxjs";
 import {NotificationService} from "../service/notification.service";
 
@@ -9,7 +9,7 @@ import {NotificationService} from "../service/notification.service";
   styleUrls: ['./urls.component.css']
 })
 export class UrlsComponent {
-  createShortUrl: CreateShortUrlDto = new CreateShortUrlDto();
+  createShortUrl: CreateShortUrl = new CreateShortUrl();
   urls: UrlBriefDto[];
 
   constructor(private readonly urlsClient: UrlsClient, private readonly notificationService: NotificationService) {
@@ -41,6 +41,13 @@ export class UrlsComponent {
         }))
       .subscribe(res => {
         console.log(res)
+        this.getUrls();
       })
+  }
+
+  delete(url: UrlBriefDto) {
+    this.urlsClient.delete(url).subscribe(res => {
+      this.getUrls();
+    })
   }
 }

@@ -1,11 +1,20 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Shortener.Application.Common.Interfaces;
+using Shortener.Application.Common.Options;
+using Shortener.Infrastructure.Identity;
 using Shortener.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddOptions<ApplicationOptions>().BindConfiguration(nameof(ApplicationOptions));
+builder.Services.AddSingleton<ApplicationOptions>(sp => sp.GetRequiredService<IOptions<ApplicationOptions>>().Value);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebUIServices();
+
 
 var app = builder.Build();
 
@@ -48,6 +57,14 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
+app.MapGet("/{code}", async (
+    [FromRoute] string code,
+    IApplicationDbContext context
+) =>
+{
+    var url = await context.Urls.FirstOrDefaultAsync(x => x.Hash == code);
+    return Results.Redirect(url!.BaseUrl);
+});
 
 app.MapRazorPages();
 

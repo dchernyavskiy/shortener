@@ -1,25 +1,26 @@
-﻿using System.Runtime.Intrinsics.Arm;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Shortener.Application.Common.Interfaces;
+using Shortener.Application.Common.Options;
 using Shortener.Application.Urls.Exceptions;
 using Shortener.Domain.Entities;
 
 namespace Shortener.Application.Urls.Features.CreatingShortUrl.v1;
 
-public record CreateShortUrlDto(string Url);
-public record CreateShortUrl(string Url, string Host) : IRequest<CreateShortUrlResponse>;
+public record CreateShortUrl(string Url) : IRequest<CreateShortUrlResponse>;
 
 public class CreateShortUrlHandler : IRequestHandler<CreateShortUrl, CreateShortUrlResponse>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IOptions<ApplicationOptions> _options;
 
-    public CreateShortUrlHandler(IApplicationDbContext context)
+    public CreateShortUrlHandler(IApplicationDbContext context, IOptions<ApplicationOptions> options)
     {
         _context = context;
+        _options = options;
     }
 
     private string GetSHA256Hash(string url)
@@ -29,7 +30,6 @@ public class CreateShortUrlHandler : IRequestHandler<CreateShortUrl, CreateShort
             .Aggregate("", (x, y) => x + y.ToString("x2"));
     }
 
-
     public async Task<CreateShortUrlResponse> Handle(CreateShortUrl request, CancellationToken cancellationToken)
     {
         if (await _context.Urls.AnyAsync(x => x.BaseUrl == request.Url, cancellationToken: cancellationToken))
@@ -37,14 +37,17 @@ public class CreateShortUrlHandler : IRequestHandler<CreateShortUrl, CreateShort
             throw new UrlAlreadyExistsException();
         }
 
-        var encodedUrl = GetSHA256Hash(request.Url).Substring(0, 10);
-        while (await _context.Urls.AnyAsync(x => x.ShortenedUrl == encodedUrl, cancellationToken: cancellationToken))
+
+        var hash = GetSHA256Hash(request.Url).Substring(0, 10);
+        var host = _options.Value.Uri.Trim('/') + "/" + hash;
+        while (await _context.Urls.AnyAsync(x => x.ShortenedUrl == host,
+                   cancellationToken: cancellationToken))
         {
-            encodedUrl = GetSHA256Hash(encodedUrl);
+            hash = GetSHA256Hash(request.Url).Substring(0, 10);
+            host = _options.Value.Uri.Trim('/') + "/" + hash;
         }
 
-        var url = new Url() { BaseUrl = request.Url, ShortenedUrl = encodedUrl };
-
+        var url = new Url() { BaseUrl = request.Url, Hash = hash, ShortenedUrl = host };
 
         await _context.Urls.AddAsync(url, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
