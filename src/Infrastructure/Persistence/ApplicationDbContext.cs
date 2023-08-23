@@ -42,7 +42,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         optionsBuilder.AddInterceptors(_auditableEntitySaveChangesInterceptor);
     }
 
-    public DbSet<Url> Urls => Set<Url>();
+    public virtual DbSet<Url> Urls => Set<Url>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
