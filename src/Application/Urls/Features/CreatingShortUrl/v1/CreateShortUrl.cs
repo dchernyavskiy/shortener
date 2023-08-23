@@ -5,16 +5,17 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Shortener.Application.Common.Interfaces;
+using Shortener.Application.Urls.Exceptions;
 using Shortener.Domain.Entities;
 
 namespace Shortener.Application.Urls.Features.CreatingShortUrl.v1;
 
-public record CreateShortUrl(string Url) : IRequest<CreateShortUrlResponse>;
+public record CreateShortUrlDto(string Url);
+public record CreateShortUrl(string Url, string Host) : IRequest<CreateShortUrlResponse>;
 
 public class CreateShortUrlHandler : IRequestHandler<CreateShortUrl, CreateShortUrlResponse>
 {
     private readonly IApplicationDbContext _context;
-
 
     public CreateShortUrlHandler(IApplicationDbContext context)
     {
@@ -33,7 +34,7 @@ public class CreateShortUrlHandler : IRequestHandler<CreateShortUrl, CreateShort
     {
         if (await _context.Urls.AnyAsync(x => x.BaseUrl == request.Url, cancellationToken: cancellationToken))
         {
-            throw new Exception("Url already exists.");
+            throw new UrlAlreadyExistsException();
         }
 
         var encodedUrl = GetSHA256Hash(request.Url).Substring(0, 10);

@@ -9,6 +9,6 @@ public class UrlEntityTypeConfiguration : IEntityTypeConfiguration<Url>
 {
     public void Configure(EntityTypeBuilder<Url> builder)
     {
-        builder.ToTable(nameof(Url).Pluralize().Underscore(), ApplicationDbContext.Schema);
+        builder.ToTable(nameof(Url).Pluralize().Underscore());
     }
 }

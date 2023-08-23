@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Shortener.Application.Urls.Exceptions;
 
 namespace Shortener.WebUI.Filters;
 
@@ -18,6 +19,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
                 { typeof(NotFoundException), HandleNotFoundException },
                 { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
+                { typeof(UrlAlreadyExistsException), HandleUrlAlreadyExistsException },
             };
     }
 
@@ -115,6 +117,23 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         context.Result = new ObjectResult(details)
         {
             StatusCode = StatusCodes.Status403Forbidden
+        };
+
+        context.ExceptionHandled = true;
+    }
+    
+    private void HandleUrlAlreadyExistsException(ExceptionContext context)
+    {
+        var details = new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "The url already exists.",
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
+        };
+
+        context.Result = new ObjectResult(details)
+        {
+            StatusCode = StatusCodes.Status409Conflict
         };
 
         context.ExceptionHandled = true;

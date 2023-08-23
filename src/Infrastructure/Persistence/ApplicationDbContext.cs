@@ -13,8 +13,6 @@ namespace Shortener.Infrastructure.Persistence;
 
 public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
 {
-    public const string Schema = "shrortener";
-
     private readonly IMediator _mediator;
     private readonly AuditableEntitySaveChangesInterceptor _auditableEntitySaveChangesInterceptor;
 

@@ -45,7 +45,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateShortUrl"
+                "$ref": "#/components/schemas/CreateShortUrlDto"
               }
             }
           },
@@ -64,6 +64,16 @@
             }
           },
           "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
             "description": "",
             "content": {
               "application/json": {
@@ -131,7 +141,19 @@
       },
       "CreateShortUrlResponse": {
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "shortenedUrl": {
+            "type": "string"
+          }
+        }
       },
       "ProblemDetails": {
         "type": "object",
@@ -162,7 +184,7 @@
           }
         }
       },
-      "CreateShortUrl": {
+      "CreateShortUrlDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

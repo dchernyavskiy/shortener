@@ -18,9 +18,10 @@ public class UrlsController : ApiControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(CreateShortUrlResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesDefaultResponseType]
-    public async Task<ActionResult<CreateShortUrlResponse>> Create([FromBody] CreateShortUrl command)
+    public async Task<ActionResult<CreateShortUrlResponse>> Create([FromBody] CreateShortUrlDto command)
     {
-        return await Mediator.Send(command);
+        return await Mediator.Send(new CreateShortUrl(command.Url, Request.Host.Host));
     }
 }
