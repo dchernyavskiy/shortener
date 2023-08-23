@@ -1,7 +1,8 @@
 import {Component} from '@angular/core';
 import {CreateShortUrl, DeleteUrl, GetUrls, UrlBriefDto, UrlsClient} from "../web-api-client";
-import {catchError} from "rxjs";
+import {catchError, Observable} from "rxjs";
 import {NotificationService} from "../service/notification.service";
+import {AuthorizeService} from "../../api-authorization/authorize.service";
 
 @Component({
   selector: 'app-urls',
@@ -11,9 +12,11 @@ import {NotificationService} from "../service/notification.service";
 export class UrlsComponent {
   createShortUrl: CreateShortUrl = new CreateShortUrl();
   urls: UrlBriefDto[];
+  isAuthenticated: Observable<boolean>;
 
-  constructor(private readonly urlsClient: UrlsClient, private readonly notificationService: NotificationService) {
+  constructor(private readonly urlsClient: UrlsClient, private readonly notificationService: NotificationService, private readonly authorizeService: AuthorizeService) {
     this.getUrls();
+    this.isAuthenticated = authorizeService.isAuthenticated();
   }
 
   getUrls() {

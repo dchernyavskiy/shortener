@@ -19,6 +19,7 @@ export interface IUrlsClient {
     get(query: GetUrls | undefined): Observable<GetUrlsResponse>;
     create(command: CreateShortUrl): Observable<CreateShortUrlResponse>;
     delete(command: DeleteUrl): Observable<void>;
+    getDetails(id: string | undefined): Observable<GetUrlDetailsResponse>;
 }
 
 @Injectable({
@@ -201,6 +202,67 @@ export class UrlsClient implements IUrlsClient {
         }
         return _observableOf(null as any);
     }
+
+    getDetails(id: string | undefined): Observable<GetUrlDetailsResponse> {
+        let url_ = this.baseUrl + "/api/Urls/get-details?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDetails(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetUrlDetailsResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetUrlDetailsResponse>;
+        }));
+    }
+
+    protected processGetDetails(response: HttpResponseBase): Observable<GetUrlDetailsResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetUrlDetailsResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let resultdefault: any = null;
+            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            resultdefault = ProblemDetails.fromJS(resultDatadefault);
+            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
+            }));
+        }
+    }
 }
 
 export class GetUrlsResponse implements IGetUrlsResponse {
@@ -325,50 +387,6 @@ export class GetUrls implements IGetUrls {
 export interface IGetUrls {
 }
 
-export class CreateShortUrlResponse implements ICreateShortUrlResponse {
-    id?: string;
-    baseUrl?: string;
-    shortenedUrl?: string;
-
-    constructor(data?: ICreateShortUrlResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.baseUrl = _data["baseUrl"];
-            this.shortenedUrl = _data["shortenedUrl"];
-        }
-    }
-
-    static fromJS(data: any): CreateShortUrlResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateShortUrlResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["baseUrl"] = this.baseUrl;
-        data["shortenedUrl"] = this.shortenedUrl;
-        return data;
-    }
-}
-
-export interface ICreateShortUrlResponse {
-    id?: string;
-    baseUrl?: string;
-    shortenedUrl?: string;
-}
-
 export class ProblemDetails implements IProblemDetails {
     type?: string | undefined;
     title?: string | undefined;
@@ -431,6 +449,138 @@ export interface IProblemDetails {
     instance?: string | undefined;
 
     [key: string]: any;
+}
+
+export class GetUrlDetailsResponse implements IGetUrlDetailsResponse {
+    url?: UrlDto;
+
+    constructor(data?: IGetUrlDetailsResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.url = _data["url"] ? UrlDto.fromJS(_data["url"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetUrlDetailsResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetUrlDetailsResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["url"] = this.url ? this.url.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetUrlDetailsResponse {
+    url?: UrlDto;
+}
+
+export class UrlDto implements IUrlDto {
+    id?: string;
+    baseUrl?: string;
+    shortenedUrl?: string;
+    hash?: string;
+    created?: Date;
+
+    constructor(data?: IUrlDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.baseUrl = _data["baseUrl"];
+            this.shortenedUrl = _data["shortenedUrl"];
+            this.hash = _data["hash"];
+            this.created = _data["created"] ? new Date(_data["created"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): UrlDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UrlDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["baseUrl"] = this.baseUrl;
+        data["shortenedUrl"] = this.shortenedUrl;
+        data["hash"] = this.hash;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IUrlDto {
+    id?: string;
+    baseUrl?: string;
+    shortenedUrl?: string;
+    hash?: string;
+    created?: Date;
+}
+
+export class CreateShortUrlResponse implements ICreateShortUrlResponse {
+    id?: string;
+    baseUrl?: string;
+    shortenedUrl?: string;
+
+    constructor(data?: ICreateShortUrlResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.baseUrl = _data["baseUrl"];
+            this.shortenedUrl = _data["shortenedUrl"];
+        }
+    }
+
+    static fromJS(data: any): CreateShortUrlResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateShortUrlResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["baseUrl"] = this.baseUrl;
+        data["shortenedUrl"] = this.shortenedUrl;
+        return data;
+    }
+}
+
+export interface ICreateShortUrlResponse {
+    id?: string;
+    baseUrl?: string;
+    shortenedUrl?: string;
 }
 
 export class CreateShortUrl implements ICreateShortUrl {

@@ -5,6 +5,7 @@ using Shortener.Application.Urls.Features.CreatingShortUrl.v1;
 using Shortener.Application.Urls.Features.GettingUrls.v1;
 using Microsoft.AspNetCore.Http;
 using Shortener.Application.Urls.Features.DeletingUrl.v1;
+using Shortener.Application.Urls.Features.GettingUrlDetails.v1;
 
 namespace Shortener.WebUI.Controllers;
 
@@ -19,6 +20,16 @@ public class UrlsController : ApiControllerBase
 
     [HttpGet]
     public async Task<ActionResult<GetUrlsResponse>> Get([FromQuery] GetUrls query)
+    {
+        return await Mediator.Send(query);
+    }
+
+    [Authorize]
+    [HttpGet("get-details")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(GetUrlDetailsResponse), StatusCodes.Status200OK)]
+    [ProducesDefaultResponseType]
+    public async Task<ActionResult<GetUrlDetailsResponse>> GetDetails([FromQuery] GetUrlDetails query)
     {
         return await Mediator.Send(query);
     }

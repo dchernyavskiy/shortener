@@ -128,6 +128,62 @@
           }
         ]
       }
+    },
+    "/api/Urls/get-details": {
+      "get": {
+        "tags": [
+          "Urls"
+        ],
+        "operationId": "Urls_GetDetails",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUrlDetailsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -167,22 +223,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "CreateShortUrlResponse": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid"
-          },
-          "baseUrl": {
-            "type": "string"
-          },
-          "shortenedUrl": {
-            "type": "string"
-          }
-        }
-      },
       "ProblemDetails": {
         "type": "object",
         "additionalProperties": {
@@ -209,6 +249,54 @@
           "instance": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "GetUrlDetailsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "$ref": "#/components/schemas/UrlDto"
+          }
+        }
+      },
+      "UrlDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "shortenedUrl": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateShortUrlResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "baseUrl": {
+            "type": "string"
+          },
+          "shortenedUrl": {
+            "type": "string"
           }
         }
       },

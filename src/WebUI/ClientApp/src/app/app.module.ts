@@ -14,13 +14,15 @@ import {AuthorizeInterceptor} from 'src/api-authorization/authorize.interceptor'
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NotificationComponent} from './notification/notification.component';
 import {UrlsComponent} from './urls/urls.component';
+import { UrlDetailsComponent } from './url-details/url-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     NotificationComponent,
-    UrlsComponent
+    UrlsComponent,
+    UrlDetailsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({appId: 'ng-cli-universal'}),
