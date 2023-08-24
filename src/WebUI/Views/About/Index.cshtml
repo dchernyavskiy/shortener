@@ -1,4 +1,5 @@
-﻿@{
+﻿@model dynamic
+@{
     ViewBag.Title = "About";
     Layout = null;
     var about = "Description";
@@ -18,5 +19,5 @@
 }
 else
 {
-    <p>Description</p>
+    <p>@Model.Description</p>
 }
