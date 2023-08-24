@@ -1,40 +1,8 @@
 ﻿@{
     ViewBag.Title = "About";
     Layout = null;
+    var about = "Description";
 }
-
-
-@* <header> *@
-@*   <nav *@
-@*     class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" *@
-@*   > *@
-@*     <div class="container"> *@
-@*       <a class="navbar-brand" href="https://localhost:44447">Shortener.WebUI</a> *@
-@*       <button *@
-@*         class="navbar-toggler" *@
-@*         type="button" *@
-@*         data-toggle="collapse" *@
-@*         data-target=".navbar-collapse" *@
-@*         aria-label="Toggle navigation" *@
-@*         [attr.aria-expanded]="isExpanded" *@
-@*       > *@
-@*         <span class="navbar-toggler-icon"></span> *@
-@*       </button> *@
-@*       <div *@
-@*         class="navbar-collapse collapse d-sm-inline-flex justify-content-end" *@
-@*         [ngClass]="{ show: isExpanded }" *@
-@*       > *@
-@*         <ul class="navbar-nav flex-grow"> *@
-@*           <li *@
-@*             class="nav-item" *@
-@*           > *@
-@*             <a class="nav-link text-dark" href="https://localhost:44447">Urls</a> *@
-@*           </li> *@
-@*         </ul> *@
-@*       </div> *@
-@*     </div> *@
-@*   </nav> *@
-@* </header> *@
 
 <h2>About View</h2>
 
@@ -43,12 +11,12 @@
     <form method="post">
         <div class="form-group">
             <label for="description">Description:</label>
-            <textarea class="form-control" id="description" name="Description" rows="4">AAA</textarea>
+            <textarea class="form-control" id="description" name="Description" rows="4">@about</textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary">@about</button>
     </form>
 }
 else
 {
-    <p>AAAA</p>
+    <p>Description</p>
 }
