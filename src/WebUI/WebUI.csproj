@@ -50,6 +50,14 @@
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Views\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\About\Index.cshtml" />
+    </ItemGroup>
+
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
         <!-- Ensure Node.js is installed -->
         <Exec Command="node --version" ContinueOnError="true">

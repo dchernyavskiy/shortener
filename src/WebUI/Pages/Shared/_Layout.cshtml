@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title - My MVC Application</title>
+    <!-- Include your CSS and JavaScript references here -->
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li>@Html.ActionLink("About", "Index", "About")</li>
+            <!-- Add more navigation links as needed -->
+        </ul>
+    </nav>
+</header>
+
+<div class="container">
+    @RenderBody() <!-- Render the content of individual views here -->
+</div>
+
+<footer>
+    <!-- Add footer content here -->
+</footer>
+</body>
+</html>

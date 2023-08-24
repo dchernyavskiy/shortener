@@ -56,7 +56,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
+    pattern: "{controller=About}/{action=Index}/{id?}");
 app.MapGet("/{code}", async (
     [FromRoute] string code,
     IApplicationDbContext context

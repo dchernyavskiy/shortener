@@ -24,7 +24,7 @@
           Encoded Url
         </th>
         <th scope="col" class="tw-px-6 tw-py-3"
-            *ngIf="isAuthenticated"
+            *ngIf="isAuthenticated | async"
         >
           Actions
         </th>
@@ -50,7 +50,7 @@
             Delete
           </button>
           <a [routerLink]="['/urls', url.id]"
-             *ngIf="isAuthenticated"
+             *ngIf="isAuthenticated | async"
              class="tw-px-4 tw-py-2 tw-rounded-md tw-bg-sky-500 tw-font-semibold text-white"
           >
             Details
